@@ -21,3 +21,6 @@ Thumbs.db
 # Optional: Build directories (if you eventually use TypeScript or a bundler)
 dist/
 build/
+
+# Instruction files
+Instrucciones.txt
