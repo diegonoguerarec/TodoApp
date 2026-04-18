@@ -1,6 +1,9 @@
 {
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
   },
   "name": "backend",
   "version": "1.0.0",
@@ -10,5 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^7.7.0"
+  }
 }
