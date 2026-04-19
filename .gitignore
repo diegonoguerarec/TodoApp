@@ -24,6 +24,7 @@ build/
 
 # Instruction files
 Instrucciones.txt
+Validaciones.txt
 
 # From prisma init command
 # Keep environment variables out of version control
