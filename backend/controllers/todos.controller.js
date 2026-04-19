@@ -13,6 +13,8 @@ async function create(req, res) {
 async function list(req, res) {
     const data = await todosService.listTodos();
 
+    // Validations should go here
+
     res.status(200).json({message: `Sending all Todos`, count: data.length, data});
 }
 
@@ -20,12 +22,16 @@ async function update(req, res) {
     const id = req.params.id;
     const {name, description} = req.body;
 
+    // Validations should go here
+
     const updatedTodo = await todosService.updateTodo(id, {name, description});
     res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
 }
 
 async function remove(req, res) {
     const id = req.params.id;
+
+    // Validations should go here
 
     const deletedTodo = await todosService.deleteTodo(id);
 
