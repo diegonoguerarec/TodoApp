@@ -35,7 +35,7 @@ async function remove(req, res) {
 
     const deletedTodo = await todosService.deleteTodo(id);
 
-    res.status(200).json({message: `Deleted Todo with id ${id}`, data: updatedTodo});
+    res.status(200).json({message: `Deleted Todo with id ${id}`, data: deletedTodo});
 }
 
 module.exports = { create, list, update, remove };
