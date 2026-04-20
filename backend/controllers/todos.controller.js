@@ -1,11 +1,16 @@
 const todosService = require('../services/todos.services');
 
 async function create(req, res) {
-    const {name, description} = req.body;
+    const name = req.body.name;
+    const description = req.body.description;
 
-    // Validations should go here
+    // Validations
+    // Check for no values or empty strings
+    if(!name || !description || name.trim() === '' || description.trim() === '') {
+        return res.status(400).json({message: `Name and description are required`});
+    }
 
-    const newTodo = await todosService.createTodo({name, description});
+    const newTodo = await todosService.createTodo({name: name.trim(), description: description.trim()});
 
     res.status(201).json({message: `Created new Todo`, data: newTodo});
 }
@@ -20,20 +25,39 @@ async function list(req, res) {
 
 async function update(req, res) {
     const id = req.params.id;
-    const {name, description} = req.body;
+    const name = req.body.name;
+    const description = req.body.description;
 
-    // Validations should go here
+    // Validations
+    // Check for no values or empty strings
+    if(!name || !description || name.trim() === '' || description.trim() === '') {
+        return res.status(400).json({message: `Name and description are required`});
+    }
 
-    const updatedTodo = await todosService.updateTodo(id, {name, description});
+    // Check if id is a number
+    if(isNaN(parseInt(id))) {
+        return res.status(400).json({message: `Invalid id`});
+    }
+
+    //Todo: Check if the given id exists for a Todo
+
+    const updatedTodo = await todosService.updateTodo(parseInt(id), {name: name.trim(), description: description.trim()});
+    
     res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
 }
 
 async function remove(req, res) {
     const id = req.params.id;
 
-    // Validations should go here
+    // Validations
+    // Check if id is a number
+    if(isNaN(parseInt(id))) {
+        return res.status(400).json({message: `Invalid id`});
+    }
 
-    const deletedTodo = await todosService.deleteTodo(id);
+    //Todo: Check if the given id exists for a Todo
+
+    const deletedTodo = await todosService.deleteTodo(parseInt(id));
 
     res.status(200).json({message: `Deleted Todo with id ${id}`, data: deletedTodo});
 }
