@@ -10,9 +10,19 @@ async function create(req, res) {
         return res.status(400).json({message: `Name and description are required`});
     }
 
-    const newTodo = await todosService.createTodo({name: name.trim(), description: description.trim()});
+    try {
+        const newTodo = await todosService.createTodo({name: name.trim(), description: description.trim()});
 
-    res.status(201).json({message: `Created new Todo`, data: newTodo});
+        res.status(201).json({message: `Created new Todo`, data: newTodo});
+    } catch (error) {
+        if (error.code === 'P2002') { // Check for unique constraint error
+            res.status(409).json({message: `Todo already exists`});
+            console.error(error);
+        } else {
+            console.error(error);
+            res.status(500).json({message: 'Internal server error'});
+        }
+    }
 }
 
 async function list(req, res) {
@@ -39,11 +49,22 @@ async function update(req, res) {
         return res.status(400).json({message: `Invalid id`});
     }
 
-    //Todo: Check if the given id exists for a Todo
-
-    const updatedTodo = await todosService.updateTodo(parseInt(id), {name: name.trim(), description: description.trim()});
-    
-    res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
+    //Check if the given id exists for a Todo
+    try {
+        const updatedTodo = await todosService.updateTodo(parseInt(id), {name: name.trim(), description: description.trim()});
+        res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
+    } catch (error) {
+        if (error.code === 'P2025') { // If Todo with id does nos exist
+            res.status(404).json({message: `Todo with id ${id} does not exist`});
+            console.error(error);
+        }else if (error.code === 'P2002') { // Check for unique constraint error
+            res.status(409).json({message: `Todo already exists`});
+            console.error(error);
+        } else {
+            console.error(error);
+            res.status(500).json({message: 'Internal server error'});
+        }
+    }
 }
 
 async function remove(req, res) {
@@ -56,10 +77,19 @@ async function remove(req, res) {
     }
 
     //Todo: Check if the given id exists for a Todo
-
-    const deletedTodo = await todosService.deleteTodo(parseInt(id));
-
-    res.status(200).json({message: `Deleted Todo with id ${id}`, data: deletedTodo});
+    try {
+        const deletedTodo = await todosService.deleteTodo(parseInt(id));
+        res.status(200).json({message: `Deleted Todo with id ${id}`, data: deletedTodo});
+    }
+    catch (error) {
+        if (error.code === 'P2025') { // If Todo with id does nos exist
+            res.status(404).json({message: `Todo with id ${id} does not exist`});
+            console.error(error);
+        } else {
+            console.error(error);
+            res.status(500).json({message: 'Internal server error'});
+        }
+    }
 }
 
 module.exports = { create, list, update, remove };

@@ -2,12 +2,7 @@ const { prisma } = require('../db/prisma');
 
 async function createTodo({name, description}) {
     // Business validation should be here
-    return await prisma.todo.create({
-        data: {
-            name,
-            description
-        }
-    });
+    return await prisma.todo.create({data: {name, description}});
 }
 
 async function listTodos() {
