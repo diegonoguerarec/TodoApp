@@ -10,6 +10,13 @@ async function listTodos() {
     return await prisma.todo.findMany();
 }
 
+async function getTodoById(id) {
+    // Business validation should be here
+    return await prisma.todo.findUnique({
+        where: {id: parseInt(id)}
+    });
+}
+
 async function updateTodo(id, {name, description}) {
     // Business validation should be here
     return await prisma.todo.update({
@@ -25,4 +32,4 @@ async function deleteTodo(id) {
     });
 }
 
-module.exports = { createTodo, listTodos, updateTodo, deleteTodo };
+module.exports = { createTodo, listTodos, getTodoById, updateTodo, deleteTodo };

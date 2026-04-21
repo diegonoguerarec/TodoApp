@@ -33,6 +33,24 @@ async function list(req, res) {
     res.status(200).json({message: `Sending all Todos`, count: data.length, data});
 }
 
+async function getById(req, res) {
+    const id = req.params.id;
+
+    // Check if id is a number
+    if(isNaN(parseInt(id))) {
+        return res.status(400).json({message: `Invalid id`});
+    }
+
+    // Call service
+    try {
+        const todo = await todosService.getTodoById(parseInt(id));
+        res.status(200).json({message: `Sending Todo with id ${id}`, data: todo});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
 async function update(req, res) {
     const id = req.params.id;
     const name = req.body.name;
@@ -92,4 +110,4 @@ async function remove(req, res) {
     }
 }
 
-module.exports = { create, list, update, remove };
+module.exports = { create, list, getById, update, remove };
