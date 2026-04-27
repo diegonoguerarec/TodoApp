@@ -55,21 +55,44 @@ async function update(req, res) {
     const id = req.params.id;
     const name = req.body.name;
     const description = req.body.description;
+    const completed = req.body.completed;
 
     // Validations
-    // Check for no values or empty strings
-    if(!name || !description || name.trim() === '' || description.trim() === '') {
-        return res.status(400).json({message: `Name and description are required`});
-    }
-
     // Check if id is a number
     if(isNaN(parseInt(id))) {
         return res.status(400).json({message: `Invalid id`});
     }
 
+    const data = {};
+
+    if (name !== undefined) {
+        if (!name || name.trim() === '') {
+            return res.status(400).json({message: `Name cannot be empty`});
+        }
+        data.name = name.trim();
+    }
+
+    if (description !== undefined) {
+        if (!description || description.trim() === '') {
+            return res.status(400).json({message: `Description cannot be empty`});
+        }
+        data.description = description.trim();
+    }
+
+    if (completed !== undefined) {
+        if (typeof completed !== 'boolean') {
+            return res.status(400).json({message: `Completed must be a boolean`});
+        }
+        data.completed = completed;
+    }
+
+    if (Object.keys(data).length === 0) {
+        return res.status(400).json({message: `At least one field is required`});
+    }
+
     //Check if the given id exists for a Todo
     try {
-        const updatedTodo = await todosService.updateTodo(parseInt(id), {name: name.trim(), description: description.trim()});
+        const updatedTodo = await todosService.updateTodo(parseInt(id), data);
         res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
     } catch (error) {
         if (error.code === 'P2025') { // If Todo with id does nos exist

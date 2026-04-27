@@ -182,3 +182,176 @@
     border-right-color: var(--border);
   }
 }
+
+.todoApp {
+  padding: 32px 20px 48px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.todoHeader h1 {
+  margin: 0;
+}
+
+.todoHeader p {
+  margin: 6px 0 0;
+}
+
+.todoForm {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  background: var(--social-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.todoField label {
+  display: block;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--text-h);
+  margin-bottom: 6px;
+}
+
+.todoField input,
+.todoField textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.todoField textarea {
+  resize: vertical;
+}
+
+.todoField input:focus-visible,
+.todoField textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.todoActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.todoActions button {
+  font: inherit;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.todoActions button:hover {
+  box-shadow: var(--shadow);
+}
+
+.todoActions button:disabled,
+.todoRowActions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.todoActions .primary {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--text-h);
+}
+
+.todoError {
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text-h);
+}
+
+.todoListSection h2 {
+  margin: 0 0 10px;
+}
+
+.todoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.todoItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.todoItem:first-child {
+  border-top: none;
+}
+
+.todoToggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.todoToggle input {
+  margin-top: 4px;
+}
+
+.todoText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.todoText.done {
+  text-decoration: line-through;
+  opacity: 0.75;
+}
+
+.todoName {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.todoDescription {
+  font-size: 14px;
+}
+
+.todoRowActions {
+  display: flex;
+  gap: 8px;
+}
+
+.todoRowActions button {
+  font: inherit;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.todoRowActions button:hover {
+  box-shadow: var(--shadow);
+}

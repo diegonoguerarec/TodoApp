@@ -17,11 +17,11 @@ async function getTodoById(id) {
     });
 }
 
-async function updateTodo(id, {name, description}) {
+async function updateTodo(id, data) {
     // Business validation should be here
     return await prisma.todo.update({
         where: {id:parseInt(id)},
-        data: {name, description}
+        data
     });
 }
 

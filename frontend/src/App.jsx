@@ -1,125 +1,198 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import { createTodo, deleteTodo, listTodos, updateTodo } from './api/todos'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todos, setTodos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [editingId, setEditingId] = useState(null)
+
+  const isEditing = editingId !== null
+
+  const sortedTodos = useMemo(() => {
+    return [...todos].sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+  }, [todos])
+
+  async function refresh() {
+    setError('')
+    setLoading(true)
+    try {
+      const data = await listTodos()
+      setTodos(Array.isArray(data) ? data : [])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load todos')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    refresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function resetForm() {
+    setName('')
+    setDescription('')
+    setEditingId(null)
+  }
+
+  function startEdit(todo) {
+    setError('')
+    setEditingId(todo.id)
+    setName(todo.name ?? '')
+    setDescription(todo.description ?? '')
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault()
+    setError('')
+
+    const trimmedName = name.trim()
+    const trimmedDescription = description.trim()
+    if (!trimmedName || !trimmedDescription) {
+      setError('Name and description are required')
+      return
+    }
+
+    setSaving(true)
+    try {
+      if (isEditing) {
+        const updated = await updateTodo(editingId, {
+          name: trimmedName,
+          description: trimmedDescription,
+        })
+        setTodos((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
+      } else {
+        const created = await createTodo({
+          name: trimmedName,
+          description: trimmedDescription,
+        })
+        setTodos((prev) => [...prev, created])
+      }
+      resetForm()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Request failed')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function onToggle(todo) {
+    setError('')
+
+    const nextCompleted = !todo.completed
+    setTodos((prev) =>
+      prev.map((t) => (t.id === todo.id ? { ...t, completed: nextCompleted } : t)),
+    )
+
+    try {
+      const updated = await updateTodo(todo.id, { completed: nextCompleted })
+      setTodos((prev) => prev.map((t) => (t.id === todo.id ? updated : t)))
+    } catch (e) {
+      setTodos((prev) => prev.map((t) => (t.id === todo.id ? todo : t)))
+      setError(e instanceof Error ? e.message : 'Failed to update todo')
+    }
+  }
+
+  async function onRemove(todo) {
+    setError('')
+    setTodos((prev) => prev.filter((t) => t.id !== todo.id))
+    if (editingId === todo.id) resetForm()
+
+    try {
+      await deleteTodo(todo.id)
+    } catch (e) {
+      await refresh()
+      setError(e instanceof Error ? e.message : 'Failed to delete todo')
+    }
+  }
 
   return (
+    <div className="todoApp">
+      <header className="todoHeader">
+        <h1>Todos</h1>
+      </header>
 
-    <>Hello world!</>
-
-    /*
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+      <form className="todoForm" onSubmit={onSubmit}>
+        <div className="todoField">
+          <label htmlFor="name">Name</label>
+          <input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Buy groceries"
+            autoComplete="off"
+          />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
+
+        <div className="todoField">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g. Milk, eggs, bread"
+            rows={3}
+          />
         </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <div className="todoActions">
+          <button className="primary" type="submit" disabled={saving}>
+            {isEditing ? (saving ? 'Saving…' : 'Save') : saving ? 'Creating…' : 'Create'}
+          </button>
+          {isEditing ? (
+            <button type="button" onClick={resetForm} disabled={saving}>
+              Cancel
+            </button>
+          ) : null}
+        </div>
+      </form>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+      {error ? <div className="todoError">{error}</div> : null}
+
+      <section className="todoListSection" aria-busy={loading ? 'true' : 'false'}>
+        <h2>List</h2>
+
+        {loading ? (
+          <p>Loading…</p>
+        ) : sortedTodos.length === 0 ? (
+          <p>No todos yet.</p>
+        ) : (
+          <ul className="todoList">
+            {sortedTodos.map((todo) => (
+              <li key={todo.id} className="todoItem">
+                <label className="todoToggle">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(todo.completed)}
+                    onChange={() => onToggle(todo)}
+                  />
+                  <span className={todo.completed ? 'todoText done' : 'todoText'}>
+                    <span className="todoName">{todo.name}</span>
+                    <span className="todoDescription">{todo.description}</span>
+                  </span>
+                </label>
+
+                <div className="todoRowActions">
+                  <button type="button" onClick={() => startEdit(todo)} disabled={saving}>
+                    Edit
+                  </button>
+                  <button type="button" onClick={() => onRemove(todo)} disabled={saving}>
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
           </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
+        )}
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-    */
+    </div>
   )
 }
 
