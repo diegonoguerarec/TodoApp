@@ -8,7 +8,7 @@ const app = express();
 // Use Json parser middleware
 app.use(express.json());
 
-// Allow frontend apps (e.g. Vite dev server) to call this API
+// Allow frontend apps to call this API
 app.use(cors());
 
 app.get('/', (req, res) => {
