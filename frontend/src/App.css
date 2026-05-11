@@ -195,6 +195,32 @@
   margin: 0;
 }
 
+.todoHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.todoHeaderActions button {
+  font: inherit;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.todoHeaderActions button:hover {
+  box-shadow: var(--shadow);
+}
+
+.todoHeaderActions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .todoHeader p {
   margin: 6px 0 0;
 }

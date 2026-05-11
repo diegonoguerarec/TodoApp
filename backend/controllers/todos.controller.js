@@ -1,6 +1,7 @@
 const todosService = require('../services/todos.services');
 
 async function create(req, res) {
+    const user_id = req.user.id; // Get user ID from auth middleware
     const name = req.body.name;
     const description = req.body.description;
 
@@ -11,7 +12,7 @@ async function create(req, res) {
     }
 
     try {
-        const newTodo = await todosService.createTodo({name: name.trim(), description: description.trim()});
+        const newTodo = await todosService.createTodo({name: name.trim(), description: description.trim(), user_id: user_id});
 
         res.status(201).json({message: `Created new Todo`, data: newTodo});
     } catch (error) {
@@ -26,7 +27,8 @@ async function create(req, res) {
 }
 
 async function list(req, res) {
-    const data = await todosService.listTodos();
+    const user_id = req.user.id; // Get user ID from auth middleware
+    const data = await todosService.listTodos(user_id);
 
     // Validations should go here
 
@@ -34,6 +36,7 @@ async function list(req, res) {
 }
 
 async function getById(req, res) {
+    const user_id = req.user.id; // Get user ID from auth middleware
     const id = req.params.id;
 
     // Check if id is a number
@@ -43,7 +46,7 @@ async function getById(req, res) {
 
     // Call service
     try {
-        const todo = await todosService.getTodoById(parseInt(id));
+        const todo = await todosService.getTodoById(parseInt(id), user_id);
         res.status(200).json({message: `Sending Todo with id ${id}`, data: todo});
     } catch (error) {
         console.error(error);
@@ -52,6 +55,7 @@ async function getById(req, res) {
 }
 
 async function update(req, res) {
+    const user_id = req.user.id; // Get user ID from auth middleware
     const id = req.params.id;
     const name = req.body.name;
     const description = req.body.description;
@@ -92,7 +96,7 @@ async function update(req, res) {
 
     //Check if the given id exists for a Todo
     try {
-        const updatedTodo = await todosService.updateTodo(parseInt(id), data);
+        const updatedTodo = await todosService.updateTodo(parseInt(id), user_id, data);
         res.status(200).json({message: `Updated Todo with id ${id}`, data: updatedTodo});
     } catch (error) {
         if (error.code === 'P2025') { // If Todo with id does nos exist
@@ -110,6 +114,7 @@ async function update(req, res) {
 
 async function remove(req, res) {
     const id = req.params.id;
+    const user_id = req.user.id; // Get user ID from auth middleware
 
     // Validations
     // Check if id is a number
@@ -119,7 +124,7 @@ async function remove(req, res) {
 
     //Todo: Check if the given id exists for a Todo
     try {
-        const deletedTodo = await todosService.deleteTodo(parseInt(id));
+        const deletedTodo = await todosService.deleteTodo(parseInt(id), user_id);
         res.status(200).json({message: `Deleted Todo with id ${id}`, data: deletedTodo});
     }
     catch (error) {
