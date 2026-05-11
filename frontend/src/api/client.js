@@ -1,6 +1,6 @@
-export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+export const API_URL = import.meta.env.VITE_API_URL
 
-const TOKEN_STORAGE_KEY = 'todoapp_token'
+const TOKEN_STORAGE_KEY = import.meta.env.VITE_TOKEN_STORAGE_KEY
 
 export class ApiError extends Error {
   constructor(message, status, payload) {
