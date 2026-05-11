@@ -12,7 +12,7 @@ async function register({username, password}) {
         throw new Error("Username already exists");
     }
     
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_SALT_ROUNDS));
 
     const newUser = await prisma.user.create({
         data: {
@@ -49,7 +49,7 @@ async function login({username, password}) {
             username: user.username
         },
         process.env.JWT_SECRET,
-        {expiresIn: '1h'}
+        {expiresIn: process.env.JWT_EXPIRES_IN}
     );
 
     return token;
